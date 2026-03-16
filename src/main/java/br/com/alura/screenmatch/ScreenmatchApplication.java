@@ -25,7 +25,7 @@ public class ScreenmatchApplication implements CommandLineRunner {
 
 		// Obtém dados do fimle
 		var consumoAPI = new ConsumoAPI();
-		var json = consumoAPI.obterDados("http://www.omdbapi.com/?t=rick+and+morty&apikey=6585022c");
+		var json = consumoAPI.obterDados("https://www.omdbapi.com/?t=rick+and+morty&apikey=6585022c");
 		System.out.println(json);
 
 		// Converte desserializa dados
