@@ -9,6 +9,7 @@ import br.com.alura.screenmatch.service.ConverteDados;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -41,6 +42,12 @@ public class Principal {
 //                System.out.println(episodiosTemporada.get(j).titulo());
 //            }
 //        }
+
+        // Imprime os títulos em todos os episódios
         temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+
+        List<DadosEpisodio> todosEpisodios = temporadas.stream()
+                .flatMap(t -> t.episodios().stream())
+                .collect(Collectors.toList());
     }
 }
