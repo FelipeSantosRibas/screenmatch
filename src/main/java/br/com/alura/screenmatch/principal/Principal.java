@@ -28,7 +28,7 @@ public class Principal {
         var nomeSerie = leitura.nextLine();
         var json = consumo.obterDados(ENDERECO + nomeSerie.replaceAll(" ", "+") + API_KEY);
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-        System.out.println(dados);
+        //System.out.println(dados);
 
         List<DadosTemporada> temporadas = new ArrayList<>();
 
@@ -36,22 +36,23 @@ public class Principal {
 		for (int i = 1; i <= dados.totalTemporadas(); i++){
 			json = consumo.obterDados(ENDERECO + nomeSerie.replaceAll(" ", "+") + "&season="+i + API_KEY);
 			DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
-			System.out.println(dadosTemporada);
+			//System.out.println(dadosTemporada);
 			temporadas.add(dadosTemporada);
 		}
 
         // Imprime os títulos em todos os episódios
-        temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+        // temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
 
         List<DadosEpisodio> todosEpisodios = temporadas.stream()
                 .flatMap(t -> t.episodios().stream())
                 .collect(Collectors.toList());
 
-
+        // Top 10 episódios
         todosEpisodios.stream() // Torna stream
                 .filter(e -> !e.avaliacao().equals("N/A")) // Remove avaliações N/A
                 .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed()) // Ordena os valores por avaliacao
-                .limit(5) // Limita a 5
+                .limit(10) // Limita a 5
+                .map(e -> e.titulo().toUpperCase())
                 .forEach(System.out::println); // Imprime cada um
 
         List<Episodio> episodios = temporadas.stream()
@@ -59,7 +60,7 @@ public class Principal {
                 .stream().map(d -> new Episodio(t.numero(), d)))
                 .collect(Collectors.toList());
 
-        episodios.forEach(System.out::println);
+        //episodios.forEach(System.out::println);
 
         System.out.println("A partir de que ano você deseja ver os episódios?");
         var ano = leitura.nextInt();
