@@ -3,9 +3,12 @@ package br.com.alura.screenmatch.principal;
 import br.com.alura.screenmatch.model.DadosEpisodio;
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
+import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,7 +51,33 @@ public class Principal {
         todosEpisodios.stream() // Torna stream
                 .filter(e -> !e.avaliacao().equals("N/A")) // Remove avaliações N/A
                 .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed()) // Ordena os valores por avaliacao
-                .limit(5)
+                .limit(5) // Limita a 5
                 .forEach(System.out::println); // Imprime cada um
+
+        List<Episodio> episodios = temporadas.stream()
+                .flatMap(t -> t.episodios()
+                .stream().map(d -> new Episodio(t.numero(), d)))
+                .collect(Collectors.toList());
+
+        episodios.forEach(System.out::println);
+
+        System.out.println("A partir de que ano você deseja ver os episódios?");
+        var ano = leitura.nextInt();
+        leitura.nextLine();
+
+        LocalDate dataBusca = LocalDate.of(ano, 1, 1);
+
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyy");
+        episodios.stream()
+                .filter(e -> e.getDataLancamento() != null &&
+                        (e.getDataLancamento().isAfter(dataBusca)
+                        || e.getDataLancamento().isEqual(dataBusca)
+                        )
+                )
+                .forEach(e -> System.out.println(
+                        "Temporada: "+e.getTemporada()+
+                                ", Episódio: "+e.getTitulo()+
+                                ", Data lançamento: "+e.getDataLancamento().format(formatador)
+                ));
     }
 }
