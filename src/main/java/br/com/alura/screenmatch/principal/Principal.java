@@ -6,6 +6,7 @@ import br.com.alura.screenmatch.model.DadosTemporada;
 import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
+import br.com.alura.screenmatch.view.TerminalView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,50 +17,83 @@ public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private ConsumoAPI consumo = new ConsumoAPI();
     private ConverteDados conversor = new ConverteDados();
+    private TerminalView view = new TerminalView();
 
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apikey=6585022c";
 
     public void exibeMenu(){
-        System.out.println("Digite o nome da série para pesquisar:");
-        var nomeSerie = leitura.nextLine();
-        var json = consumo.obterDados(ENDERECO + nomeSerie.replaceAll(" ", "+") + API_KEY);
-        DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-        //System.out.println(dados);
 
+        DadosSerie dados = null;
+        String json = null;
+        String nomeSerie = null;
+
+        // Ciclo até encontrar série
+        var prosseguir = true;
+        while(prosseguir) {
+            // Pergunta nome da série
+            nomeSerie = view.perguntaNomeSerie();
+
+            // Verificações da série
+            try {
+                // Procura série e desserializa
+                json = consumo.obterDados(ENDERECO + nomeSerie.replaceAll(" ", "+") + API_KEY);
+                dados = conversor.obterDados(json, DadosSerie.class);
+
+                // Verifica erros
+                if (!dados.tipo().equalsIgnoreCase("series")) { // Título não é uma série
+                    System.out.println("Título encontrado não é uma série");
+                    view.perguntaTentarNovamente();
+
+                } else { // Série encontrada
+                    prosseguir = view.serieEncontrada(dados);
+                }
+
+            } catch (Exception e){ // Série não encontrada
+                System.out.println("Não foi possível encontrar a série");
+                view.perguntaTentarNovamente();
+            }
+        }
+
+        // Dados temporadas
         List<DadosTemporada> temporadas = new ArrayList<>();
+        for (int i = 1; i <= dados.totalTemporadas(); i++){
+            json = consumo.obterDados(ENDERECO + nomeSerie.replaceAll(" ", "+") + "&season="+i + API_KEY);
+            DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
+            //System.out.println(dadosTemporada);
+            temporadas.add(dadosTemporada);
+        }
 
-		// Temporadas
-		for (int i = 1; i <= dados.totalTemporadas(); i++){
-			json = consumo.obterDados(ENDERECO + nomeSerie.replaceAll(" ", "+") + "&season="+i + API_KEY);
-			DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
-			//System.out.println(dadosTemporada);
-			temporadas.add(dadosTemporada);
-		}
-
-        // Imprime os títulos em todos os episódios
-        // temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
-
-        // Temporadas -> lista de episódios
+        // Dados temporadas -> Dados episódios
         List<DadosEpisodio> todosEpisodios = temporadas.stream()
                 .flatMap(t -> t.episodios().stream())
-                .collect(Collectors.toList());
+                .toList();
 
-//        // Top 10 episódios
-//        todosEpisodios.stream() // Torna stream
-//                .filter(e -> !e.avaliacao().equals("N/A")) // Remove avaliações N/A
-//                .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed()) // Ordena os valores por avaliacao
-//                .limit(10) // Limita a 5
-//                .map(e -> e.titulo().toUpperCase())
-//                .forEach(System.out::println); // Imprime cada um
-
-        // DadosEpisodio -> Episodios
+        // Dados episódio -> Episódios
         List<Episodio> episodios = temporadas.stream()
                 .flatMap(t -> t.episodios()
-                .stream().map(d -> new Episodio(t.numero(), d)))
-                .collect(Collectors.toList());
+                        .stream().map(d -> new Episodio(t.numero(), d)))
+                .toList();
+        //episodios.forEach(System.out::println);
 
-        episodios.forEach(System.out::println);
+
+        prosseguir = true;
+        while(prosseguir) {
+            var opcao = view.perguntaEstatisticas();
+            switch (opcao){
+                // Série
+                case "0" -> view.estatisticasSerie(dados);
+                // Todas as temporadas
+                case "1" -> view.estatisticasTodasTemporadas(temporadas, episodios);
+                // Busca por temporada
+                case "2" -> view.estatisticasTemporada(temporadas, episodios);
+                // Todos os episódios
+                case "3" -> view.estatisticasEpisodios(episodios);
+                // Busca por episódio
+            }
+            prosseguir = true;
+        }
+
 
 
 //        // Busca por título
@@ -95,10 +129,14 @@ public class Principal {
 //                                ", Data lançamento: "+e.getDataLancamento().format(formatador)
 //                ));
 
-        Map<Integer, Double> avaliacoesPorTemporada = episodios.stream()
-                .filter(e -> e.getAvaliacao() != null)
-                .collect(Collectors.groupingBy(Episodio::getTemporada,
-                        Collectors.averagingDouble(Episodio::getAvaliacao)));
-        System.out.println(avaliacoesPorTemporada);
+
+//        // Estatísticas dos episódios
+//        DoubleSummaryStatistics est = episodios.stream()
+//                .filter(e -> e.getAvaliacao() != null)
+//                .collect(Collectors.summarizingDouble(Episodio::getAvaliacao));
+//        System.out.println("Média: "+est.getAverage());
+//        System.out.println("Melhor episódio: "+est.getMax());
+//        System.out.println("Pior episódio: "+est.getMin());
+//        System.out.println("Quantidade de avaliações: "+est.getCount());
     }
 }
