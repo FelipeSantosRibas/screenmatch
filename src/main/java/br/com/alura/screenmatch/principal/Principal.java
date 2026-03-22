@@ -88,26 +88,19 @@ public class Principal {
                 // Busca por temporada
                 case "2" -> view.estatisticasTemporada(temporadas, episodios);
                 // Todos os episódios
-                case "3" -> view.estatisticasEpisodios(episodios);
+                case "3" -> view.estatisticasTodosEpisodios(episodios);
                 // Busca por episódio
+                case "4" -> view.estatisticasEpisodios(episodios);
             }
-            prosseguir = true;
+            System.out.println("Aperte enter para continuar, ou digite \"fim\" para encerrar sessão");
+            if(leitura.nextLine().equalsIgnoreCase("fim")){
+                prosseguir = false;
+            }
         }
 
 
 
-//        // Busca por título
-//        System.out.println("Qual episódio deseja buscar?");
-//        var trechoTitulo = leitura.nextLine();
-//        Optional<Episodio> episodioBuscado = episodios.stream()
-//                .filter(e -> e.getTitulo().toLowerCase().contains(trechoTitulo.toLowerCase()))
-//                .findFirst();
-//        if (episodioBuscado.isPresent()){
-//            System.out.println("Episódio encontrado!");
-//            System.out.println("Temporada: "+ episodioBuscado.get());
-//        } else{
-//            System.out.println("Episódio não encontrado");
-//        }
+
 
 //        // Busca por ano
 //        System.out.println("A partir de que ano você deseja ver os episódios?");

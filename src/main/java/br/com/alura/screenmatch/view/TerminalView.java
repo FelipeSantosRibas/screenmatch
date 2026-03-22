@@ -4,9 +4,7 @@ import br.com.alura.screenmatch.model.DadosEpisodio;
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
 import br.com.alura.screenmatch.model.Episodio;
-import com.fasterxml.jackson.annotation.JsonAlias;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -106,14 +104,14 @@ public class TerminalView {
 
         // Melhor episódio
         DadosEpisodio melhor = temporada.episodios().stream()
-                .filter(e -> e.avaliacao() != null)
+                .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A"))
                 .max(Comparator.comparing(DadosEpisodio::avaliacao))
                 .stream().toList()
                 .get(0);
 
         // Pior episódio
         DadosEpisodio pior = temporada.episodios().stream()
-                .filter(e -> e.avaliacao() != null)
+                .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A"))
                 .min(Comparator.comparing(DadosEpisodio::avaliacao))
                 .stream().toList()
                 .get(0);
@@ -124,17 +122,45 @@ public class TerminalView {
         System.out.println("Pior episódio: "+pior.toString().substring(14,pior.toString().length()-1));
     }
 
-    public void estatisticasEpisodios(List<Episodio> episodios) {
-        episodios.forEach(System.out::println);
-        var media = episodios.stream().collect(Collectors.summarizingDouble(Episodio::getAvaliacao)).getAverage();
-        System.out.println("Média de avaliações dos episódios: "+media);
+    public void estatisticasTodosEpisodios(List<Episodio> episodios) {
 
-//              // Top 10 episódios
-//        episodios.stream() // Torna stream
-//                .filter(e -> e.getAvaliacao() != null) // Remove avaliações N/A
-//                .sorted(Comparator.comparing(Episodio::getAvaliacao).reversed()) // Ordena os valores por avaliacao
-//                .limit(10) // Limita a 5
-//                .map(e -> e.getTitulo().toUpperCase())
-//                .forEach(System.out::println); // Imprime cada um
+        // Estatísticas de episódios
+        DoubleSummaryStatistics est = episodios.stream()
+                .filter(e -> e.getAvaliacao() != null)
+                .collect(Collectors.summarizingDouble(Episodio::getAvaliacao));
+
+        // Top 10 episódios
+        List<String> top10Episodios = new ArrayList<>();
+
+        episodios.stream() // Torna stream
+                .filter(e -> e.getAvaliacao() != null) // Remove avaliações N/A
+                .sorted(Comparator.comparing(Episodio::getAvaliacao).reversed()) // Ordena os valores por avaliacao
+                .limit(10) // Limita a 10
+                .forEach(e -> top10Episodios.add(e.getTitulo())); // Imprime cada um
+
+        //episodios.forEach(System.out::println);
+        System.out.println("Total de episódios: "+episodios.size());
+        System.out.println("Média de avaliações dos episódios: "+est.getAverage());
+        System.out.println("Melhor nota: "+est.getMax());
+        System.out.println("Pior nota: "+est.getMin());
+        System.out.println("Top 10 episódios: "+top10Episodios);
+
+
+    }
+
+    public void estatisticasEpisodios(List<Episodio> episodios){
+        System.out.println("Digite o nome do episódio que deseja buscar:");
+
+        var trechoTitulo = leitura.nextLine();
+        Optional<Episodio> episodioBuscado = episodios.stream()
+                .filter(e -> e.getTitulo().toLowerCase().contains(trechoTitulo.toLowerCase()))
+                .findFirst();
+        if (episodioBuscado.isPresent()){
+            System.out.println("Episódio encontrado!");
+            System.out.println(episodioBuscado.get());
+        } else{
+            System.out.println("Episódio não encontrado");
+        }
+
     }
 }
