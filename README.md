@@ -8,3 +8,5 @@
 - Expressões Lambda
 - Regex (Regular Expressions)
 - MVC Architecture
+
+![Imagem do programa](img/terminalView.png)
