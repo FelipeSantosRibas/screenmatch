@@ -1,4 +1,4 @@
-# Aprendizados deste projeto (até agora):
+# Aprendizados deste projeto:
 - Consumo de api (Obmd API) usando classes HTTP (client, request e response)
 - Gerenciamento de dependências com Maven
 - Desserialização de json utilizando a biblioteca **Jackson**
@@ -6,4 +6,5 @@
 - Collections
 - Streams API
 - Expressões Lambda
-- Regex
+- Regex (Regular Expressions)
+- MVC Architecture
