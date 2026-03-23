@@ -4,9 +4,10 @@
 - Desserialização de json utilizando a biblioteca **Jackson**
 - Tratamento de Excessões
 - Collections
-- Streams API
+- Stream API
 - Expressões Lambda
 - Regex (Regular Expressions)
 - MVC Architecture
+- Records e Enums
 
 ![Imagem do programa](img/terminalView.png)
