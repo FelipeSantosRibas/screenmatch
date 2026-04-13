@@ -1,5 +1,5 @@
 # Aprendizados deste projeto:
-- Consumo de api (Obmd API) usando classes HTTP (client, request e response)
+- Consumo de api (Obmd API e Langbly) usando classes HTTP (client, request e response)
 - Gerenciamento de dependências com Maven
 - Desserialização de json utilizando a biblioteca **Jackson**
 - Tratamento de Excessões
@@ -9,5 +9,3 @@
 - Regex (Regular Expressions)
 - MVC Architecture
 - Records e Enums
-
-![Imagem do programa](img/terminalView.png)
