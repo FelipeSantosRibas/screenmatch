@@ -2,13 +2,24 @@ package br.com.alura.screenmatch.model;
 
 import br.com.alura.screenmatch.service.TraduzLangbly;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalDouble;
 
-public class Serie {
+@Entity
+@Table(name = "series")
+public class Serie{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    //@Column(name = "nome")
+    @Column(unique = true)
     private String titulo;
     private Integer totalTemporadas;
     private Double avaliacao;
+    @Enumerated(EnumType.STRING)
     private Categoria genero;
     private String atores;
     private String poster;
@@ -16,6 +27,16 @@ public class Serie {
     private String tipo;
     private String ano;
     private String premios;
+    @Transient
+    private List<Episodio> episodios = new ArrayList<>();
+
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        this.episodios = episodios;
+    }
 
     public Serie(DadosSerie dadosSerie){
         this.titulo = dadosSerie.titulo();

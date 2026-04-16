@@ -1,6 +1,7 @@
 package br.com.alura.screenmatch.principal;
 
 import br.com.alura.screenmatch.model.*;
+import br.com.alura.screenmatch.repository.SerieRepository;
 import br.com.alura.screenmatch.service.ConsumoAPI;
 import br.com.alura.screenmatch.service.ConverteDados;
 import br.com.alura.screenmatch.view.TerminalView;
@@ -19,6 +20,12 @@ public class Principal {
 
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apikey=6585022c";
+
+    private SerieRepository repositorio;
+
+    public Principal(SerieRepository repositorio){
+        this.repositorio = repositorio;
+    }
 
     public void exibeMenu() {
         var opcao = "-1";
@@ -55,7 +62,9 @@ public class Principal {
 
     private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
-        dadosSeries.add(dados);
+        Serie serie = new Serie(dados);
+        repositorio.save(serie);
+        //  dadosSeries.add(dados);
         System.out.println(dados);
     }
 
