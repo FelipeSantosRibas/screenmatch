@@ -9,3 +9,4 @@
 - Regex (Regular Expressions)
 - MVC Architecture
 - Records e Enums
+- Integração com Banco de Dados (PostgreSQL) usando Spring Data JPA
