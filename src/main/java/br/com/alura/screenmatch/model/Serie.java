@@ -27,7 +27,8 @@ public class Serie{
     private String tipo;
     private String ano;
     private String premios;
-    @Transient
+
+    @OneToMany(mappedBy = "serie")
     private List<Episodio> episodios = new ArrayList<>();
 
     public List<Episodio> getEpisodios() {
